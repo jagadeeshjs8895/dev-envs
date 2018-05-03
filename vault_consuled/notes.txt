@@ -1,0 +1,50 @@
+docker-compose up -d
+export LOCAL_IP=10.131.252.121
+export VAULT_ADDR="http://${LOCAL_IP}:8200"
+
+vault operator init -key-shares=1 -key-threshold=1
+
+    Unseal Key 1: Z6SQUXtir0vvJqcReCWH4iD+nWRPSvnntphmt+5o/SM=
+    Initial Root Token: 17c9077d-614d-1245-9261-fd95efbe7055
+
+vault operator unseal
+Unseal Key (will be hidden):
+
+  Key                    Value
+  ---                    -----
+  Seal Type              shamir
+  Sealed                 false
+  Total Shares           1
+  Threshold              1
+  Version                0.10.0
+  Cluster Name           vault-cluster-cbb64012
+  Cluster ID             7ecc01ff-9fc8-764f-f421-71c0b592f5c0
+  HA Enabled             true
+  HA Cluster             n/a
+  HA Mode                standby
+  Active Node Address    <none>
+
+
+export VAULT_TOKEN="17c9077d-614d-1245-9261-fd95efbe7055"
+vault write secret/admin user=yolo password=yolo
+
+    Success! Data written to: secret/admin
+
+vault read secret/admin
+    Key                 Value
+    ---                 -----
+    refresh_interval    768h
+    user                yolo
+    password            yolo
+--dns-route53-propagation-seconds 120 \
+
+# cluster init
+docker-compose down && docker-compose up -d
+export LOCAL_IP=10.131.252.121
+export VAULT_ADDR="http://${LOCAL_IP}:8200"
+vault_init=$(vault operator init -key-shares=1 -key-threshold=1 |grep -e "Unseal Key" -e "Initial Root Token")
+ export VAULT_TOKEN="$(echo ${vault_init}|grep 'Token'|cut -d ' ' -f 4)" ; echo $VAULT_TOKEN
+ export VAULT_UNSEAL_KEY="$(echo ${vault_init}|grep 'Key'|cut -d ' ' -f 4)" ; echo $VAULT_UNSEAL_KEY
+ vault operator unseal ${VAULT_UNSEAL_KEY}
+vault write secret/admin user=yolo password=yolo
+vault read secret/admin
