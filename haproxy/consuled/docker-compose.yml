@@ -1,0 +1,12 @@
+version: "3.6"
+services:
+  haproxy:
+    image: xorilog/haprox-consuled
+    volumes:
+      - ./conf/dynamic.cfg.ctmpl:/etc/consul/haproxy/dynamic.cfg.ctmpl
+      - ./conf/haproxy.cfg:/etc/haproxy/haproxy.cfg
+    ports:
+      - "80:80"
+      - "3000:3000"
+    environment:
+      CONSUL_URL: "${DEFAULT_IP}:8500"
