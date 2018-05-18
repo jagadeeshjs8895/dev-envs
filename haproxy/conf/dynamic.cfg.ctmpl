@@ -1,5 +1,5 @@
 backend dynamic-backends
-    balance roundrobin{{if service "haprox-backend"}}{{range service "haprox-backend"}}
+    balance roundrobin{{if service "whoami"}}{{range service "whoami"}}
     server {{.Node}} {{.Address}}:{{.Port}}{{end}}
     {{else}}
     server google www.google.com:80

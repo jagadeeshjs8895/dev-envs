@@ -2,6 +2,8 @@ version: "3.6"
 services:
   haproxy:
     image: xorilog/haprox-consuled
+    networks:
+      - haprox-demo
     volumes:
       - ./conf/dynamic.cfg.ctmpl:/etc/consul/haproxy/dynamic.cfg.ctmpl
       - ./conf/haproxy.cfg:/etc/haproxy/haproxy.cfg
@@ -13,14 +15,17 @@ services:
 
   whoami-1: &whoami
     image: emilevauge/whoami
+    hostname: whoami-1
     networks:
       - haprox-demo
     environment:
       CONSUL_URL: "${DEFAULT_IP}:8500"
   whoami-2:
     <<: *whoami
+    hostname: whoami-2
   whoami-3:
     <<: *whoami
+    hostname: whoami-3
 
 networks:
   haprox-demo:
