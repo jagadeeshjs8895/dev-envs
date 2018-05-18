@@ -1,6 +1,6 @@
 backend dynamic-backends
     balance roundrobin{{if service "whoami"}}{{range service "whoami"}}
-    server {{.Node}} {{.Address}}:{{.Port}}{{end}}
+    server {{.ID}}{{.Node}} {{.Address}}:{{.Port}}{{end}}
     {{else}}
     server google www.google.com:80
     {{end}}

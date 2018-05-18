@@ -1,0 +1,43 @@
+# Registering custom services
+
+curl -X PUT \
+     -H "Content-Type:application/json" \
+     -d \
+  '{
+    "ID": "whoami-1",
+    "Name": "whoami",
+    "Address": "whoami-1",
+    "Port": 80
+  }' \
+   'http://localhost:8500/v1/agent/service/register'
+
+# whoami-2
+curl -X PUT \
+     -H "Content-Type:application/json" \
+     -d \
+  '{
+    "ID": "whoami-2",
+    "Name": "whoami",
+    "Address": "whoami-2",
+    "Port": 80
+  }' \
+   'http://localhost:8500/v1/agent/service/register'
+
+# whoami-3
+curl -X PUT \
+     -H "Content-Type:application/json" \
+     -d \
+  '{
+    "ID": "whoami-3",
+    "Name": "whoami",
+    "Address": "whoami-3",
+    "Port": 80
+  }' \
+   'http://localhost:8500/v1/agent/service/register'
+
+
+
+# Deregister
+curl -X PUT http://localhost:8500/v1/agent/service/deregister/whoami-1
+curl -X PUT http://localhost:8500/v1/agent/service/deregister/whoami-2
+curl -X PUT http://localhost:8500/v1/agent/service/deregister/whoami-3
