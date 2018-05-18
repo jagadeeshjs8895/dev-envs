@@ -1,6 +1,5 @@
 #/bin/ash
 CONSUL_URL=${CONSUL_URL:-"consul_server:8500"}
-echo $CONSUL_URL
 
 # prepare backend
 consul-template \
