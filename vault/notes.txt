@@ -36,15 +36,23 @@ vault read secret/admin
     refresh_interval    768h
     user                yolo
     password            yolo
---dns-route53-propagation-seconds 120 \
+
 
 # cluster init
-docker-compose down && docker-compose up -d
-export LOCAL_IP=10.131.252.121
+export LOCAL_IP=$(default_ip)
 export VAULT_ADDR="http://${LOCAL_IP}:8200"
-vault_init=$(vault operator init -key-shares=1 -key-threshold=1 |grep -e "Unseal Key" -e "Initial Root Token")
- export VAULT_TOKEN="$(echo ${vault_init}|grep 'Token'|cut -d ' ' -f 4)" ; echo $VAULT_TOKEN
- export VAULT_UNSEAL_KEY="$(echo ${vault_init}|grep 'Key'|cut -d ' ' -f 4)" ; echo $VAULT_UNSEAL_KEY
+docker-compose down && docker-compose up -d
+
+while ! vault_init=$(vault operator init -key-shares=1 -key-threshold=1 |grep -e "Unseal Key" -e "Initial Root Token"); do
+    sleep 1
+done
+ echo "export VAULT_TOKEN=$(echo ${vault_init}|grep 'Token'|cut -d ' ' -f 4)" > ./.secret
+ echo "export VAULT_UNSEAL_KEY=$(echo ${vault_init}|grep 'Key'|cut -d ' ' -f 4)" >> ./.secret
+ source ./.secret
  vault operator unseal ${VAULT_UNSEAL_KEY}
+sleep 1
 vault write secret/admin user=yolo password=yolo
 vault read secret/admin
+vault delete secret/admin
+
+xdg-open http://${LOCAL_IP}:8200
