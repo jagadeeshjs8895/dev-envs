@@ -1,7 +1,6 @@
 version: "3.6"
 services:
   vault:
-    container_name: vault.server
     image: vault
     ports:
       - "8200:8200"
