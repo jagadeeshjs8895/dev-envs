@@ -14,4 +14,4 @@ haproxy -f /etc/haproxy/haproxy.cfg -f /etc/haproxy/dynamic/ -p /var/run/haproxy
 consul-template \
     -consul-addr=${CONSUL_URL} \
     -consul-retry \
-    -template="/etc/consul/haproxy/dynamic.cfg.ctmpl:/etc/haproxy/dynamic/dynamic.cfg:haproxy -f /etc/haproxy/haproxy.cfg -f /etc/haproxy/dynamic/ -p /var/run/haproxy.pid -D -sf $(cat /var/run/haproxy.pid)"
+    -template="/etc/consul/haproxy/dynamic.cfg.ctmpl:/etc/haproxy/dynamic/dynamic.cfg:haproxy -f /etc/haproxy/haproxy.cfg -f /etc/haproxy/dynamic/ -p /var/run/haproxy.pid -D -st $(cat /var/run/haproxy.pid)"
