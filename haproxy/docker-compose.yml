@@ -13,13 +13,16 @@ services:
     environment:
       CONSUL_URL: "${DEFAULT_IP}:8500"
 
-  whoami-1: &whoami
+  whoami-sorry: &whoami
     image: emilevauge/whoami
-    hostname: whoami-1
+    hostname: whoami-sorry
     networks:
       - haprox-demo
     environment:
       CONSUL_URL: "${DEFAULT_IP}:8500"
+  whoami-1:
+    <<: *whoami
+    hostname: whoami-1
   whoami-2:
     <<: *whoami
     hostname: whoami-2

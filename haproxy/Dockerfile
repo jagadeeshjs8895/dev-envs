@@ -1,5 +1,7 @@
 FROM alpine:3.7
-RUN apk add --update --repository http://dl-3.alpinelinux.org/alpine/edge/testing/ \
+RUN apk add --update \
+	--repository http://dl-3.alpinelinux.org/alpine/edge/main/ \
+	--repository http://dl-3.alpinelinux.org/alpine/edge/testing/ \
 	jq \
 	curl \
 	consul-template \
