@@ -4,22 +4,22 @@ services:
     image: xorilog/haprox-consuled
     networks:
       - haprox-demo
-    volumes:
-      - ./conf/dynamic.cfg.ctmpl:/etc/consul/haproxy/dynamic.cfg.ctmpl
-      - ./conf/haproxy.cfg:/etc/haproxy/haproxy.cfg
     ports:
       - "80:80"
-      - "3000:3000"
     environment:
+      SILO: "b2c"
       CONSUL_URL: "${DEFAULT_IP}:8500"
 
   whoami-sorry: &whoami
     image: emilevauge/whoami
     hostname: whoami-sorry
+    environment:
+      CONSUL_URL: ${DEFAULT_IP}
+      SERVICE_NAME: "reservation-gateway"
+      SILO: ${SILO:-"b2c"}
     networks:
       - haprox-demo
-    environment:
-      CONSUL_URL: "${DEFAULT_IP}:8500"
+      - consul-demo
   whoami-1:
     <<: *whoami
     hostname: whoami-1
@@ -32,3 +32,5 @@ services:
 
 networks:
   haprox-demo:
+  consul-demo:
+    name: cluster_consul_consul-demo

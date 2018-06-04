@@ -1,0 +1,60 @@
+{{- range $all_tags, $all_services := services|byTag}}{{if $all_tags | contains "b2c" -}}
+# vim:set noexpandtab:
+defaults node
+	mode http
+	log global
+	option httplog
+	option dontlognull
+	option redispatch
+	option contstats
+	retries 3
+	backlog 10000
+	timeout check            5s
+	timeout client          15s
+	timeout connect          5s
+	timeout server          15s
+	timeout tunnel        3600s
+	timeout http-keep-alive  1s
+	timeout http-request    15s
+	timeout queue           30s
+	timeout tarpit          60s
+	default-server maxconn 20 inter 3s rise 2 fall 3
+	option forwardfor if-none
+	balance leastconn
+	maxconn 320
+	bind-process 1
+
+frontend node
+	bind *:8081
+	maxconn 1000
+{{range services}}
+{{- if and (in .Tags "nodejs") (in .Tags (env "SILO"))}}
+{{- $haproxy_context := (printf "services/%s/haproxy/nodejs/%s" (env "SILO") .Name)}}
+{{- if and (keyExists (printf "%s/frontend/use_node_frontend" $haproxy_context)) (keyOrDefault (printf "%s/frontend/use_node_frontend" $haproxy_context) "false" |parseBool)}}
+	{{- if keyExists (printf "%s/frontend/domain" $haproxy_context)}}
+	acl {{.Name}} hdr(host) -i {{key (printf "%s/frontend/domain" $haproxy_context)}}
+	{{- else}}
+	acl {{.Name}} hdr_beg(host) -i {{.Name}}.
+	{{- end}}
+	use_backend {{.Name}} if {{.Name}}
+{{- end}}
+
+backend {{.Name}}
+{{- $services:=service .Name "passing"}}
+{{- if keyExists (printf "%s/backend/liveness_check" $haproxy_context)}}
+    option httpchk GET {{key (printf "%s/backend/liveness_check" $haproxy_context)}}
+{{- end}}
+    maxconn {{multiply 40 (len $services)}}
+{{- if gt (len $services) 0 -}}
+	{{range $services}}
+    server {{.ID}} {{.Address}}:{{.Port -}}
+		{{- if keyExists (printf "%s/backend/liveness_check" $haproxy_context)}} check{{end -}}
+	{{end}}
+{{- else}}
+    server dead 127.0.0.1:65535 # 503
+{{- end}}
+{{end}}
+{{- end}}
+
+{{- end}}
+{{- end}}

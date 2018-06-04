@@ -8,8 +8,10 @@ RUN apk add --update \
 	haproxy \
 	&& rm -rf /var/cache/apk/* /tmp/* $HOME/.cache
 
-RUN mkdir -p /etc/haproxy/dynamic /etc/consul/haproxy
-ADD docker-entrypoint.sh /bin/docker-entrypoint.sh
+RUN mkdir -p /etc/haproxy/conf.d /etc/consul/haproxy
+ADD ./conf/consul/* /etc/consul/haproxy/
+ADD ./conf/haproxy/haproxy.cfg /etc/haproxy/haproxy.cfg
+ADD docker-entrypoint.sh haprox_reload.sh /bin/
 
 WORKDIR /etc/haproxy
 

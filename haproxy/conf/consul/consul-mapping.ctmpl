@@ -1,0 +1,10 @@
+{{range services}}
+    {{- if and (in .Tags "nodejs") (in .Tags (env "SILO"))}}
+        {{- $haproxy_context := (printf "services/%s/haproxy/nodejs/%s" (env "SILO") .Name)}}
+        {{- if keyExists (printf "%s/frontend/domain" $haproxy_context)}}
+            {{- key (printf "%s/frontend/domain" $haproxy_context)}} {{.Name}}
+        {{- else}}
+            {{- .Name}}. {{.Name}}
+        {{- end}}
+    {{- end}}
+{{end}}

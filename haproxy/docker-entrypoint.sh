@@ -5,13 +5,15 @@ CONSUL_URL=${CONSUL_URL:-"consul_server:8500"}
 consul-template \
     -consul-addr=${CONSUL_URL} \
     -consul-retry \
-    -template "/etc/consul/haproxy/dynamic.cfg.ctmpl:/etc/haproxy/dynamic/dynamic.cfg" -once
+    -template "/etc/consul/haproxy/consul-mapping.ctmpl:/etc/haproxy/consul-mapping" \
+    -template "/etc/consul/haproxy/${SILO}_node.cfg.ctmpl:/etc/haproxy/conf.d/${SILO}_node.cfg" -once
 
 # haprox
-haproxy -f /etc/haproxy/haproxy.cfg -f /etc/haproxy/dynamic/ -p /var/run/haproxy.pid -D
+haproxy -f /etc/haproxy/haproxy.cfg -f /etc/haproxy/conf.d/ -p /var/run/haproxy.pid -D
 
 # consul
 consul-template \
     -consul-addr=${CONSUL_URL} \
     -consul-retry \
-    -template="/etc/consul/haproxy/dynamic.cfg.ctmpl:/etc/haproxy/dynamic/dynamic.cfg:haproxy -f /etc/haproxy/haproxy.cfg -f /etc/haproxy/dynamic/ -p /var/run/haproxy.pid -D -st $(cat /var/run/haproxy.pid)"
+    -template "/etc/consul/haproxy/consul-mapping.ctmpl:/etc/haproxy/consul-mapping" \
+    -template "/etc/consul/haproxy/${SILO}_node.cfg.ctmpl:/etc/haproxy/conf.d/${SILO}_node.cfg:/bin/haprox_reload.sh"

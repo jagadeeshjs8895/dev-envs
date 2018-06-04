@@ -1,0 +1,27 @@
+# Create a service available at lafourchette.localhost
+curl -X PUT \
+-H "Content-Type:application/json" \
+-d \
+'{
+  "ID": "whoami-1",
+  "Name": "yolo",
+  "Tags": [
+    "b2c",
+    "nodejs"
+  ],
+  "Address": "whoami-1",
+  "Port": 80
+}' \
+'http://localhost:8500/v1/agent/service/register'
+
+
+# Defining Ops side service specific conf
+export service_name=yolo
+export silo=b2c
+export service_type=nodejs
+curl -L -X PUT http://localhost:8500/v1/kv/services/${silo}/haproxy/${service_type}/${service_name}/backend/liveness_check -d "/monitor/health/http_status_checks/liveness"
+curl -L -X PUT http://localhost:8500/v1/kv/services/${silo}/haproxy/${service_type}/${service_name}/backend/maxconn -d "5000"
+curl -L -X PUT http://localhost:8500/v1/kv/services/${silo}/haproxy/${service_type}/${service_name}/backend/options/default-server -d "maxconn 1000 inter 3s fall 3 rise 2"
+curl -L -X PUT http://localhost:8500/v1/kv/services/${silo}/haproxy/${service_type}/${service_name}/backend/options/timeout -d "check 5000"
+curl -L -X PUT http://localhost:8500/v1/kv/services/${silo}/haproxy/${service_type}/${service_name}/frontend/port -d "8080"
+curl -L -X PUT http://localhost:8500/v1/kv/services/${silo}/haproxy/${service_type}/${service_name}/frontend/domain -d 'api.thefork.com'
