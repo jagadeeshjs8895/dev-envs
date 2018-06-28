@@ -9,6 +9,11 @@ services:
     environment:
       SILO: "b2c"
       CONSUL_URL: "${DEFAULT_IP}:8500"
+    logging:
+      driver: gelf
+      options:
+        gelf-address: udp://${DEFAULT_IP}:12201
+        tag: haproxy
 
   whoami-sorry: &whoami
     image: emilevauge/whoami
@@ -20,6 +25,11 @@ services:
     networks:
       - haprox-demo
       - consul-demo
+    logging:
+      driver: gelf
+      options:
+        gelf-address: udp://${DEFAULT_IP}:12201
+        tag: whoami
   whoami-1:
     <<: *whoami
     hostname: whoami-1
