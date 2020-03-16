@@ -14,7 +14,7 @@ services:
     networks:
       - elk
 
-   logstash:
+  logstash:
      build:
        context: logstash/
      volumes:
